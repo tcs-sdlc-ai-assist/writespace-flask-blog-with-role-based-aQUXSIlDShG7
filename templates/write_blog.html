@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{% if post %}Edit Post — WriteSpace{% else %}Write a Post — WriteSpace{% endif %}{% endblock %}
+
+{% block content %}
+<section class="gradient-header gradient-header-sm">
+  {% if post %}
+    <h1>✏️ Edit Post</h1>
+    <p>Update your blog post below.</p>
+  {% else %}
+    <h1>✏️ Write a Post</h1>
+    <p>Share your thoughts and ideas with the WriteSpace community.</p>
+  {% endif %}
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <div class="form-card form-card-wide">
+      {% if post %}
+        <h2 class="form-title">Edit Post</h2>
+        <p class="form-subtitle">Make changes to your post and save when you're done.</p>
+      {% else %}
+        <h2 class="form-title">New Post</h2>
+        <p class="form-subtitle">Fill in the details below to publish your post.</p>
+      {% endif %}
+
+      <form method="POST" action="{% if post %}{{ url_for('edit_blog', post_id=post.id) }}{% else %}{{ url_for('write_blog') }}{% endif %}">
+        <div class="form-group">
+          <label for="title" class="form-label form-label-required">Title</label>
+          <input type="text" id="title" name="title" class="form-input" placeholder="Enter your post title" value="{{ request.form.get('title', post.title if post else '') }}" required autofocus maxlength="100">
+          <p class="form-hint">
+            <span id="titleCount">{{ (request.form.get('title', post.title if post else '') | length) }}</span> / 100 characters
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label for="content" class="form-label form-label-required">Content</label>
+          <textarea id="content" name="content" class="form-textarea form-textarea-lg" placeholder="Write your blog post content here..." required maxlength="5000">{{ request.form.get('content', post.content if post else '') }}</textarea>
+          <p class="form-hint">
+            <span id="contentCount">{{ (request.form.get('content', post.content if post else '') | length) }}</span> / 5000 characters
+          </p>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-gradient">
+            {% if post %}💾 Save Changes{% else %}🚀 Publish Post{% endif %}
+          </button>
+          <a href="{{ url_for('blogs') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var titleInput = document.getElementById('title');
+    var titleCount = document.getElementById('titleCount');
+    var contentInput = document.getElementById('content');
+    var contentCount = document.getElementById('contentCount');
+
+    if (titleInput && titleCount) {
+      titleInput.addEventListener('input', function() {
+        titleCount.textContent = titleInput.value.length;
+      });
+    }
+
+    if (contentInput && contentCount) {
+      contentInput.addEventListener('input', function() {
+        contentCount.textContent = contentInput.value.length;
+      });
+    }
+  });
+</script>
+{% endblock %}

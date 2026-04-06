@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}500 — Internal Server Error — WriteSpace{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div>
+    <div class="error-code">500</div>
+    <h2 class="error-title">Internal Server Error</h2>
+    <p class="error-desc">Something went wrong on our end. Please try again later or head back to the home page.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-gradient">🏠 Back to Home</a>
+  </div>
+</div>
+{% endblock %}

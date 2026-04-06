@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Register — WriteSpace{% endblock %}
+
+{% block content %}
+<section class="gradient-header gradient-header-sm">
+  <h1>🚀 Join WriteSpace</h1>
+  <p>Create your account and start sharing your ideas with the world.</p>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <div class="form-card">
+      <h2 class="form-title">Create Account</h2>
+      <p class="form-subtitle">Fill in the details below to get started.</p>
+
+      <form method="POST" action="{{ url_for('register') }}">
+        <div class="form-group">
+          <label for="display_name" class="form-label form-label-required">Display Name</label>
+          <input type="text" id="display_name" name="display_name" class="form-input" placeholder="Enter your display name" value="{{ request.form.get('display_name', '') }}" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="username" class="form-label form-label-required">Username</label>
+          <input type="text" id="username" name="username" class="form-input" placeholder="Choose a username" value="{{ request.form.get('username', '') }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label form-label-required">Password</label>
+          <input type="password" id="password" name="password" class="form-input" placeholder="Create a password" required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm_password" class="form-label form-label-required">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" class="form-input" placeholder="Confirm your password" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-gradient btn-block">🚀 Create Account</button>
+        </div>
+      </form>
+
+      <div class="form-footer">
+        Already have an account? <a href="{{ url_for('login') }}">Log in here →</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

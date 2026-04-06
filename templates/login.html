@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Login — WriteSpace{% endblock %}
+
+{% block content %}
+<section class="gradient-header gradient-header-sm">
+  <h1>🔑 Welcome Back</h1>
+  <p>Log in to your WriteSpace account to continue writing and reading.</p>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <div class="form-card">
+      <h2 class="form-title">Log In</h2>
+      <p class="form-subtitle">Enter your credentials to access your account.</p>
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label for="username" class="form-label form-label-required">Username</label>
+          <input type="text" id="username" name="username" class="form-input" placeholder="Enter your username" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label form-label-required">Password</label>
+          <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-gradient btn-block">🔑 Log In</button>
+        </div>
+      </form>
+
+      <div class="form-footer">
+        Don't have an account? <a href="{{ url_for('register') }}">Create one here →</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

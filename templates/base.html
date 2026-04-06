@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="WriteSpace — A modern blogging platform">
+  <title>{% block title %}WriteSpace{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  {% set current_user = session.get('user', None) %}
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="{{ url_for('home') }}" class="navbar-brand">
+        <span class="navbar-brand-icon">✍️</span>
+        WriteSpace
+      </a>
+
+      <button class="navbar-toggle" onclick="document.getElementById('navbarMenu').classList.toggle('open')" aria-label="Toggle navigation">
+        <span class="navbar-toggle-icon"></span>
+      </button>
+
+      <div class="navbar-menu" id="navbarMenu">
+        {% if current_user %}
+          {# Authenticated user links #}
+          <a href="{{ url_for('blogs') }}" class="nav-link {% if request.endpoint == 'blogs' %}active{% endif %}">📚 Blogs</a>
+          <a href="{{ url_for('write_blog') }}" class="nav-link {% if request.endpoint == 'write_blog' %}active{% endif %}">✏️ Write</a>
+
+          {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if request.endpoint and request.endpoint.startswith('admin') %}active{% endif %}">🛡️ Admin</a>
+          {% endif %}
+
+          <div class="navbar-divider"></div>
+
+          <div class="navbar-user">
+            {% from "macros/avatar.html" import render_avatar_with_name %}
+            {{ render_avatar_with_name(current_user.display_name, current_user.role, 'sm') }}
+
+            {% if current_user.role == 'admin' %}
+              <span class="badge badge-admin badge-sm">Admin</span>
+            {% else %}
+              <span class="badge badge-viewer badge-sm">Viewer</span>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-ghost">🚪 Logout</a>
+          </div>
+        {% else %}
+          {# Guest links #}
+          <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">🏠 Home</a>
+          <div class="navbar-divider"></div>
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary {% if request.endpoint == 'login' %}active{% endif %}">🔑 Login</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary {% if request.endpoint == 'register' %}active{% endif %}">🚀 Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container" id="flashContainer">
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            {% set icon = '❌' %}
+          {% elif category == 'success' %}
+            {% set icon = '✅' %}
+          {% elif category == 'warning' %}
+            {% set icon = '⚠️' %}
+          {% else %}
+            {% set icon = 'ℹ️' %}
+          {% endif %}
+          <div class="flash-message flash-message-{{ category }}">
+            <span class="flash-message-icon">{{ icon }}</span>
+            <span class="flash-message-text">{{ message }}</span>
+            <button class="flash-message-close" onclick="this.parentElement.classList.add('fade-out'); setTimeout(() => this.parentElement.remove(), 300);" aria-label="Close">&times;</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <span class="footer-brand">✍️ WriteSpace</span>
+      <p>
+        {% if current_user %}
+          <a href="{{ url_for('blogs') }}">Blogs</a> &middot;
+          <a href="{{ url_for('write_blog') }}">Write</a>
+          {% if current_user.role == 'admin' %}
+            &middot; <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('home') }}">Home</a> &middot;
+          <a href="{{ url_for('login') }}">Login</a> &middot;
+          <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+      </p>
+      <p>&copy; 2024 WriteSpace. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Auto-dismiss flash messages -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var flashMessages = document.querySelectorAll('.flash-message');
+      flashMessages.forEach(function(msg) {
+        setTimeout(function() {
+          if (msg && msg.parentElement) {
+            msg.classList.add('fade-out');
+            setTimeout(function() {
+              if (msg && msg.parentElement) {
+                msg.remove();
+              }
+            }, 300);
+          }
+        }, 5000);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Blogs — WriteSpace{% endblock %}
+
+{% block content %}
+{% from "macros/cards.html" import render_post_card %}
+
+{% set current_user = session.get('user', None) %}
+
+<section class="gradient-header gradient-header-sm">
+  <h1>📚 Blog Posts</h1>
+  <p>Discover stories and ideas from our community of writers.</p>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">All Posts</h2>
+        <p class="section-subtitle mb-0">Browse all posts from the WriteSpace community.</p>
+      </div>
+      <a href="{{ url_for('write_blog') }}" class="btn btn-gradient">✏️ Write a Post</a>
+    </div>
+
+    {% if posts %}
+      <div class="post-grid">
+        {% for post in posts %}
+          {{ render_post_card(post, current_user) }}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        <h3 class="empty-state-title">No posts yet</h3>
+        <p class="empty-state-desc">Be the first to share your thoughts with the community!</p>
+        <a href="{{ url_for('write_blog') }}" class="btn btn-gradient">✏️ Write the First Post</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

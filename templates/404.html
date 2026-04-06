@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}404 — Page Not Found — WriteSpace{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div>
+    <div class="error-code">404</div>
+    <h2 class="error-title">Page Not Found</h2>
+    <p class="error-desc">Sorry, the page you're looking for doesn't exist or may have been moved.</p>
+    <a href="{{ url_for('home') }}" class="btn btn-gradient">🏠 Back to Home</a>
+  </div>
+</div>
+{% endblock %}

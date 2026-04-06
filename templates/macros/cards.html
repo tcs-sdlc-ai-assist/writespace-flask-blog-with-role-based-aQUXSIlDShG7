@@ -1,0 +1,40 @@
+{% from "macros/avatar.html" import render_avatar %}
+
+{% macro render_post_card(post, current_user) %}
+<div class="post-card">
+  <h3 class="post-card-title">
+    <a href="{{ url_for('read_blog', post_id=post.id) }}">{{ post.title }}</a>
+  </h3>
+  <p class="post-card-excerpt">{{ post.content[:150] }}{% if post.content|length > 150 %}…{% endif %}</p>
+  <div class="post-card-meta">
+    <div class="post-card-author">
+      {{ render_avatar(post.get('author_role', 'viewer'), 'sm') }}
+      <span class="post-card-author-name">{{ post.author_name }}</span>
+    </div>
+    <span class="post-card-date">{{ post.created_at[:10] }}</span>
+  </div>
+  {% if current_user %}
+    {% if current_user.role == 'admin' or current_user.user_id == post.author_id %}
+    <div class="post-card-actions" style="margin-top: var(--space-3);">
+      <a href="{{ url_for('edit_blog', post_id=post.id) }}" class="btn btn-sm btn-secondary">✏️ Edit</a>
+    </div>
+    {% endif %}
+  {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro render_stat_card(title, value, icon, color="indigo") %}
+<div class="stat-card stat-card-{{ color }}">
+  <div class="stat-card-icon">{{ icon }}</div>
+  <div class="stat-card-value">{{ value }}</div>
+  <div class="stat-card-label">{{ title }}</div>
+</div>
+{%- endmacro %}
+
+{% macro render_feature_card(title, description, icon) %}
+<div class="feature-card">
+  <span class="feature-icon">{{ icon }}</span>
+  <h3 class="feature-title">{{ title }}</h3>
+  <p class="feature-desc">{{ description }}</p>
+</div>
+{%- endmacro %}

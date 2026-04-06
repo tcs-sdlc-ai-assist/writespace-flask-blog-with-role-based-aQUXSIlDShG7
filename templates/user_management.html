@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}User Management — WriteSpace{% endblock %}
+
+{% block content %}
+{% from "macros/avatar.html" import render_avatar %}
+
+{% set current_user = session.get('user', None) %}
+
+<section class="gradient-header gradient-header-sm">
+  <h1>👥 User Management</h1>
+  <p>Manage users on your WriteSpace platform.</p>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <!-- Create User Form -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Create New User</h2>
+        <p class="section-subtitle mb-0">Add a new user to the platform.</p>
+      </div>
+    </div>
+
+    <div class="card mb-8">
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('admin_users') }}">
+          <div class="d-flex flex-wrap gap-4">
+            <div class="form-group" style="flex: 1; min-width: 180px;">
+              <label for="display_name" class="form-label form-label-required">Display Name</label>
+              <input type="text" id="display_name" name="display_name" class="form-input" placeholder="Enter display name" value="{{ request.form.get('display_name', '') }}" required>
+            </div>
+
+            <div class="form-group" style="flex: 1; min-width: 180px;">
+              <label for="username" class="form-label form-label-required">Username</label>
+              <input type="text" id="username" name="username" class="form-input" placeholder="Choose a username" value="{{ request.form.get('username', '') }}" required>
+            </div>
+
+            <div class="form-group" style="flex: 1; min-width: 180px;">
+              <label for="password" class="form-label form-label-required">Password</label>
+              <input type="password" id="password" name="password" class="form-input" placeholder="Create a password" required>
+            </div>
+
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+              <label for="role" class="form-label form-label-required">Role</label>
+              <select id="role" name="role" class="form-select" required>
+                <option value="viewer" {% if request.form.get('role', 'viewer') == 'viewer' %}selected{% endif %}>Viewer</option>
+                <option value="admin" {% if request.form.get('role') == 'admin' %}selected{% endif %}>Admin</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-gradient">➕ Create User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">All Users</h2>
+        <p class="section-subtitle mb-0">{{ users|length }} user{{ 's' if users|length != 1 else '' }} registered on the platform.</p>
+      </div>
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+
+    {% if users %}
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <td>
+                  <span class="d-inline-flex align-center gap-2">
+                    {{ render_avatar(user.role, 'sm') }}
+                    <span class="font-semibold">{{ user.display_name }}</span>
+                  </span>
+                </td>
+                <td>
+                  <span class="text-muted">{{ user.username }}</span>
+                </td>
+                <td>
+                  {% if user.role == 'admin' %}
+                    <span class="badge badge-admin">👑 Admin</span>
+                  {% else %}
+                    <span class="badge badge-viewer">📖 Viewer</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="text-muted text-sm">{{ user.created_at[:10] if user.created_at else 'N/A' }}</span>
+                </td>
+                <td>
+                  {% if user.id == 1 or (current_user and user.id == current_user.user_id) %}
+                    <button class="btn btn-sm btn-danger" disabled title="{% if user.id == 1 %}Cannot delete default admin{% else %}Cannot delete yourself{% endif %}">🗑️ Delete</button>
+                  {% else %}
+                    <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('deleteUserModal{{ user.id }}').classList.add('active')">🗑️ Delete</button>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Delete Confirmation Modals -->
+      {% for user in users %}
+        {% if user.id != 1 and (not current_user or user.id != current_user.user_id) %}
+          <div class="modal-overlay" id="deleteUserModal{{ user.id }}">
+            <div class="modal">
+              <div class="modal-icon">⚠️</div>
+              <h3 class="modal-title">Delete User?</h3>
+              <p class="modal-desc">Are you sure you want to delete "{{ user.display_name }}" ({{ user.username }})? This action cannot be undone.</p>
+              <div class="modal-actions">
+                <form method="POST" action="{{ url_for('admin_delete_user', user_id=user.id) }}">
+                  <button type="submit" class="btn btn-danger">🗑️ Yes, Delete</button>
+                </form>
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('deleteUserModal{{ user.id }}').classList.remove('active')">Cancel</button>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <h3 class="empty-state-title">No users found</h3>
+        <p class="empty-state-desc">There are no users registered on the platform yet.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

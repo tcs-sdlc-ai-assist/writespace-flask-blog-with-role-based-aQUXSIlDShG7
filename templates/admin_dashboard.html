@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — WriteSpace{% endblock %}
+
+{% block content %}
+{% from "macros/cards.html" import render_stat_card %}
+{% from "macros/avatar.html" import render_avatar %}
+
+{% set current_user = session.get('user', None) %}
+
+<section class="gradient-header gradient-header-sm">
+  <h1>🛡️ Admin Dashboard</h1>
+  <p>Overview of your WriteSpace platform.</p>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <!-- Stats Grid -->
+    <div class="stat-grid mb-8">
+      {{ render_stat_card("Total Posts", stats.total_posts, "📝", "indigo") }}
+      {{ render_stat_card("Total Users", stats.total_users, "👥", "violet") }}
+      {{ render_stat_card("Admins", stats.admin_count, "👑", "pink") }}
+      {{ render_stat_card("Viewers", stats.viewer_count, "📖", "teal") }}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Quick Actions</h2>
+        <p class="section-subtitle mb-0">Common tasks for managing your platform.</p>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3 mb-8">
+      <a href="{{ url_for('write_blog') }}" class="btn btn-gradient">✏️ Write New Post</a>
+      <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">👥 Manage Users</a>
+      <a href="{{ url_for('blogs') }}" class="btn btn-secondary">📚 View All Blogs</a>
+    </div>
+
+    <!-- Recent Posts Table -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Recent Posts</h2>
+        <p class="section-subtitle mb-0">The latest posts published on WriteSpace.</p>
+      </div>
+      <a href="{{ url_for('blogs') }}" class="btn btn-secondary">View All →</a>
+    </div>
+
+    {% if recent_posts %}
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for post in recent_posts %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('read_blog', post_id=post.id) }}" class="font-semibold">{{ post.title }}</a>
+                </td>
+                <td>
+                  <span class="d-inline-flex align-center gap-2">
+                    {{ render_avatar(post.get('author_role', 'viewer'), 'sm') }}
+                    <span>{{ post.author_name }}</span>
+                  </span>
+                </td>
+                <td>
+                  <span class="text-muted text-sm">{{ post.created_at[:10] }}</span>
+                </td>
+                <td>
+                  <a href="{{ url_for('edit_blog', post_id=post.id) }}" class="btn btn-sm btn-secondary">✏️ Edit</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        <h3 class="empty-state-title">No posts yet</h3>
+        <p class="empty-state-desc">The platform doesn't have any posts yet. Create the first one!</p>
+        <a href="{{ url_for('write_blog') }}" class="btn btn-gradient">✏️ Write the First Post</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

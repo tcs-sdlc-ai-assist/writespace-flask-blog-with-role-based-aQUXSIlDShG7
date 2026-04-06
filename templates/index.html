@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}WriteSpace — A Modern Blogging Platform{% endblock %}
+
+{% block content %}
+{% from "macros/cards.html" import render_post_card, render_feature_card %}
+
+{% set current_user = session.get('user', None) %}
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>✍️ WriteSpace</h1>
+    <p>A modern blogging platform where ideas come to life. Write, share, and discover stories that matter.</p>
+    <div class="hero-actions">
+      {% if current_user %}
+        <a href="{{ url_for('blogs') }}" class="hero-btn-primary">📚 Browse Blogs</a>
+        <a href="{{ url_for('write_blog') }}" class="hero-btn-secondary">✏️ Write a Post</a>
+      {% else %}
+        <a href="{{ url_for('register') }}" class="hero-btn-primary">🚀 Get Started</a>
+        <a href="{{ url_for('login') }}" class="hero-btn-secondary">🔑 Login</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+  <div class="container">
+    <h2 class="section-title text-center">Why WriteSpace?</h2>
+    <p class="section-subtitle text-center">Everything you need to share your thoughts with the world.</p>
+    <div class="features-grid">
+      {{ render_feature_card(
+        "Easy Writing",
+        "A clean, distraction-free editor that lets you focus on what matters most — your words.",
+        "✏️"
+      ) }}
+      {{ render_feature_card(
+        "Role-Based Access",
+        "Admins manage the platform while viewers enjoy reading and writing. Everyone has their place.",
+        "🛡️"
+      ) }}
+      {{ render_feature_card(
+        "Beautiful Design",
+        "A modern, responsive interface that looks great on any device. Your content deserves to shine.",
+        "🎨"
+      ) }}
+    </div>
+  </div>
+</section>
+
+<!-- Latest Posts Section -->
+<section class="page-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Latest Posts</h2>
+        <p class="section-subtitle mb-0">Discover the most recent stories from our community.</p>
+      </div>
+      {% if current_user %}
+        <a href="{{ url_for('blogs') }}" class="btn btn-secondary">View All Posts →</a>
+      {% endif %}
+    </div>
+
+    {% if recent_posts %}
+      <div class="post-grid">
+        {% for post in recent_posts %}
+          {{ render_post_card(post, current_user) }}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        <h3 class="empty-state-title">No posts yet</h3>
+        <p class="empty-state-desc">Be the first to share your thoughts with the community!</p>
+        {% if current_user %}
+          <a href="{{ url_for('write_blog') }}" class="btn btn-gradient">✏️ Write the First Post</a>
+        {% else %}
+          <a href="{{ url_for('register') }}" class="btn btn-gradient">🚀 Sign Up to Start Writing</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

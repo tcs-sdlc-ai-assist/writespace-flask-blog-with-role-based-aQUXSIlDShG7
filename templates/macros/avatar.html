@@ -1,0 +1,27 @@
+{% macro render_avatar(role, size="md") %}
+{%- set role_lower = (role or "viewer")|lower -%}
+{%- if role_lower == "admin" -%}
+  {%- set emoji = "👑" -%}
+  {%- set color = "indigo" -%}
+{%- else -%}
+  {%- set emoji = "📖" -%}
+  {%- set color = "teal" -%}
+{%- endif -%}
+{%- if size == "sm" -%}
+  {%- set size_class = "avatar-sm" -%}
+{%- elif size == "lg" -%}
+  {%- set size_class = "avatar-lg" -%}
+{%- elif size == "xl" -%}
+  {%- set size_class = "avatar-xl" -%}
+{%- else -%}
+  {%- set size_class = "" -%}
+{%- endif -%}
+<span class="avatar avatar-{{ color }} {{ size_class }}" title="{{ role_lower|capitalize }}">{{ emoji }}</span>
+{%- endmacro %}
+
+{% macro render_avatar_with_name(display_name, role, size="md") %}
+<span class="avatar-with-name">
+  {{ render_avatar(role, size) }}
+  <span class="avatar-name">{{ display_name }}</span>
+</span>
+{%- endmacro %}

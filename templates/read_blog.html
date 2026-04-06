@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} — WriteSpace{% endblock %}
+
+{% block content %}
+{% from "macros/avatar.html" import render_avatar %}
+
+{% set current_user = session.get('user', None) %}
+
+<section class="gradient-header gradient-header-sm">
+  <h1>📖 Read Post</h1>
+  <p>Enjoy this story from the WriteSpace community.</p>
+</section>
+
+<section class="page-section">
+  <div class="container container-narrow">
+    <div class="blog-post">
+      <div class="blog-post-header">
+        <h1 class="blog-post-title">{{ post.title }}</h1>
+        <div class="blog-post-meta">
+          <div class="blog-post-meta-item">
+            {{ render_avatar(post.get('author_role', 'viewer'), 'sm') }}
+            <span>{{ post.author_name }}</span>
+          </div>
+          <div class="blog-post-meta-item">
+            🗓️ <span>{{ post.created_at[:10] }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="blog-post-content">{{ post.content }}</div>
+
+      <div class="blog-post-actions">
+        <a href="{{ url_for('blogs') }}" class="btn btn-secondary">← Back to Blogs</a>
+
+        {% if current_user %}
+          {% if current_user.role == 'admin' or current_user.user_id == post.author_id %}
+            <a href="{{ url_for('edit_blog', post_id=post.id) }}" class="btn btn-primary">✏️ Edit</a>
+            <button type="button" class="btn btn-danger" onclick="document.getElementById('deleteModal').classList.add('active')">🗑️ Delete</button>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if current_user and (current_user.role == 'admin' or current_user.user_id == post.author_id) %}
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <h3 class="modal-title">Delete Post?</h3>
+    <p class="modal-desc">Are you sure you want to delete "{{ post.title }}"? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <form method="POST" action="{{ url_for('delete_blog', post_id=post.id) }}">
+        <button type="submit" class="btn btn-danger">🗑️ Yes, Delete</button>
+      </form>
+      <button type="button" class="btn btn-secondary" onclick="document.getElementById('deleteModal').classList.remove('active')">Cancel</button>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
